@@ -2,32 +2,32 @@ import sys
 
 # Braille Alphabet Mapping
 braille_alphabet = {
-    'a': '.....',
-    'b': '....O',
-    'c': '....OO',
-    'd': '...O..',
-    'e': '...O.O',
-    'f': '...OO.',
-    'g': '...OOO',
-    'h': '..O...',
-    'i': '..O..O',
-    'j': '..O.OO',
-    'k': '..OO..',
-    'l': '..OO.O',
-    'm': '..OOOO',
-    'n': '.O....',
-    'o': '.O...O',
-    'p': '.O..O.',
-    'q': '.O..OO',
-    'r': '.O.O..',
-    's': '.O.O.O',
-    't': '.O.OOO',
-    'u': '.OO...',
-    'v': '.OO..O',
-    'w': '.OO.O.',
-    'x': '.OO.OO',
-    'y': '.OOO..',
-    'z': '.OOO.O',
+    'a': 'O.....',
+    'b': 'O.O...',
+    'c': 'OO....',
+    'd': 'OO.O..',
+    'e': 'O..O..',
+    'f': 'OOO...',
+    'g': 'OOOO..',
+    'h': 'O.OO..',
+    'i': '.OO...',
+    'j': '.OOO..',
+    'k': 'O...O..',
+    'l': 'O.O.O.',
+    'm': 'OO..O.',
+    'n': 'OO.OO.',
+    'o': 'O...OO.',
+    'p': 'OOO.O.',
+    'q': 'OOOOO.',
+    'r': 'O.OOO.',
+    's': '.OO.O.',
+    't': '.OOOO.',
+    'u': 'O...OO',
+    'v': 'O.O.OO',
+    'w': '.OOO.O',
+    'x': 'OO..OO',
+    'y': 'OO.OOO',
+    'z': 'O..OOO',
     ' ': '......',
     ',': '..O...',
     '.': '.....O',
@@ -44,17 +44,17 @@ braille_alphabet = {
     '"': '.OOO.O',
     '#': '.OOOO.',
     '*': '.OOOOO',
-    '0': '.O.OOOO',
-    '1': '.OO....',
-    '2': '.OO...O',
-    '3': '.OO..O.',
-    '4': '.OO..OO',
-    '5': '.OO.O..',
-    '6': '.OO.O.O',
-    '7': '.OO.OOO',
-    '8': '.OOO...',
-    '9': '.OOO..O',
-    'capital': '..O....',
+    '0': '.OOO..',
+    '1': 'O.....',
+    '2': 'O.O...',
+    '3': 'OO....',
+    '4': 'OO.O..',
+    '5': 'O..O..',
+    '6': 'OOO...',
+    '7': 'OOOO..',
+    '8': 'O.OO..',
+    '9': '.OO...',
+    'capital': '.....O',
     'number': '.O.OO..'
 }
 
@@ -63,21 +63,21 @@ inverse_braille_alphabet = {v: k for k, v in braille_alphabet.items()}
 
 def to_braille(text):
     braille_text = ''
-    capitalize_next = False
     is_number = False
 
     for char in text:
         if char.isupper():
-            braille_text += braille_alphabet['capital']
-            char = char.lower()
-        elif char.isdigit():
+            braille_text += braille_alphabet['capital']  # Append capital marker
+            char = char.lower()  # Convert to lowercase for proper mapping
+
+        if char.isdigit():
             if not is_number:
                 braille_text += braille_alphabet['number']
                 is_number = True
         else:
             is_number = False
 
-        braille_text += braille_alphabet[char]
+        braille_text += braille_alphabet.get(char, braille_alphabet[' '])  # Default to space if char not found
 
     return braille_text
 
@@ -118,8 +118,9 @@ def main():
         print("Please provide a string to translate.")
         return
 
-    text = sys.argv[1]
+    text = ' '.join(sys.argv[1:])  # Removed .lower() to preserve original case
 
+    # Check if input is already in Braille (starts with capital marker or number marker)
     if text.startswith('.....') or text.startswith('....O') or text.startswith('....OO'):
         print(to_english(text))
     else:
