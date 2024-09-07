@@ -55,7 +55,7 @@ braille_alphabet = {
     '8': 'O.OO..',
     '9': '.OO...',
     'capital': '.....O',
-    'number': '.O.OO..'
+    'number': '.O.OOO'
 }
 
 # Inverse Braille Alphabet Mapping
@@ -88,28 +88,45 @@ def to_english(braille_text):
 
     i = 0
     while i < len(braille_text):
-        char = braille_text[i:i+6]
-        if char == braille_alphabet['capital']:
+        # Read the current 6-dot Braille character
+        char = braille_text[i:i+6].replace(" ", "")  # Remove extra whitespace characters
+
+        # Check for special markers first (capital or number)
+        if char == braille_alphabet['capital'].replace(" ", ""):
             capitalize_next = True
             i += 6
             continue
-        elif char == braille_alphabet['number']:
+        elif char == braille_alphabet['number'].replace(" ", ""):
             is_number = True
             i += 6
             continue
-        elif char == braille_alphabet[' ']:
-            is_number = False
-            capitalize_next = False
+        elif char == braille_alphabet[' '].replace(" ", ""):
+            english_text += ' '
+            i += 6
+            continue
 
+        # Handle number mode
         if is_number:
-            english_text += inverse_braille_alphabet[char]
-        elif capitalize_next:
-            english_text += inverse_braille_alphabet[char].upper()
-            capitalize_next = False
-        else:
-            english_text += inverse_braille_alphabet[char]
+            if char in inverse_braille_alphabet and inverse_braille_alphabet[char].isdigit():
+                english_text += inverse_braille_alphabet[char]
+                i += 6
+                continue  # Stay in number mode for digits
+            else:
+                is_number = False  # Exit number mode when a non-digit is encountered
+                capitalize_next = False  # Reset capitalize_next flag as well
 
-        i += 6
+        # Handle letters
+        elif char in inverse_braille_alphabet:
+            if capitalize_next:
+                english_text += inverse_braille_alphabet[char].upper()
+                capitalize_next = False
+            else:
+                english_text += inverse_braille_alphabet[char]
+
+        else:
+            english_text += '?'  # Placeholder for unrecognized Braille
+
+        i += 6  # Move to the next Braille character
 
     return english_text
 
